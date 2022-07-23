@@ -1,7 +1,4 @@
 function makeDiagonalRed(table) {
-  // for (const key in table.rows) {
-  //   console.log(key);
-  // }
   let rowCounter = 0;
   for (const row of table.rows) {
     let cellCounter = 0;
