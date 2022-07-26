@@ -1,34 +1,35 @@
 function initCarousel() {
-
-
   const carousel = document.querySelector(".carousel");
+  const carouselArrowLeft = document.querySelector(".carousel__arrow_left");
   const carouselArrowRight = document.querySelector(".carousel__arrow_right");
-  const carouselArrowLeft  = document.querySelector(".carousel__arrow_left");
 
   carouselArrowLeft.style.display = "none";
-
-  carouselArrowRight.addEventListener("click", carouselScrolling);
-  carouselArrowRight.addEventListener("click", carouselArrowButtonVisibility);
+  carouselArrowLeft.style.userSelect = "none";
+  carouselArrowRight.style.userSelect = "none";
 
   carouselArrowLeft.addEventListener("click", carouselScrolling);
   carouselArrowLeft.addEventListener("click", carouselArrowButtonVisibility);
 
+  carouselArrowRight.addEventListener("click", carouselScrolling);
+  carouselArrowRight.addEventListener("click", carouselArrowButtonVisibility);
 }
 
 function carouselScrolling(event) {
   const carousel = event.currentTarget.closest(".carousel");
-  let currentScrollState = parseInt(carousel.dataset.currentScrollState,10) || 0;
+  let currentScrollState =
+    parseInt(carousel.dataset.currentScrollState, 10) || 0;
 
-  if (event.currentTarget.classList.contains("carousel__arrow_right"))
-    currentScrollState--;
-  if (event.currentTarget.classList.contains("carousel__arrow_left"))
+  if (event.currentTarget.matches(".carousel__arrow_left"))
     currentScrollState++;
+  if (event.currentTarget.matches(".carousel__arrow_right"))
+    currentScrollState--;
 
   carousel.dataset.currentScrollState = currentScrollState;
-  console.log(carousel.dataset.currentScrollState);
-  carousel.querySelector(
-    ".carousel__inner"
-  ).style.transform = `translateX(${ 100 * currentScrollState}%)`;
+
+  const carousel__inner = carousel.querySelector(".carousel__inner");
+  carousel__inner.style.transform = `translateX(${
+    carousel__inner.clientWidth * currentScrollState
+  }px)`;
 }
 
 function carouselArrowButtonVisibility(event) {
@@ -36,12 +37,11 @@ function carouselArrowButtonVisibility(event) {
   const carouselArrowRight = carousel.querySelector(".carousel__arrow_right");
   const carouselArrowLeft = carousel.querySelector(".carousel__arrow_left");
 
-  const currentScrollState = carousel.dataset.currentScrollState;
+  const currentScrollState = parseInt(carousel.dataset.currentScrollState, 10);
   const carouselChildrenElementsCount =
     carousel.querySelector(".carousel__inner").childElementCount;
 
-  carouselArrowLeft.style.display =
-    currentScrollState === "0" ? "none" : "";
+  carouselArrowLeft.style.display = !currentScrollState ? "none" : "";
   carouselArrowRight.style.display =
     -currentScrollState === carouselChildrenElementsCount - 1 ? "none" : "";
 }
