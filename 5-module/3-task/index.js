@@ -1,7 +1,7 @@
 function initCarousel() {
   const carousel = document.querySelector(".carousel");
-  const carouselArrowLeft = document.querySelector(".carousel__arrow_left");
-  const carouselArrowRight = document.querySelector(".carousel__arrow_right");
+  const carouselArrowLeft = carousel.querySelector(".carousel__arrow_left");
+  const carouselArrowRight = carousel.querySelector(".carousel__arrow_right");
 
   carouselArrowLeft.style.display = "none";
   carouselArrowLeft.style.userSelect = "none";

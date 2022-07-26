@@ -23,14 +23,14 @@ function highlight(table) {
 
       //Status coloumn
       if (cell.cellIndex === 3) {
-        if (cell.hasAttribute("data-available")) {
+        if (cell.dataset.available === undefined) {
+          row.hidden = true;
+        } else {
           row.classList.add(
-            cell.getAttribute("data-available") === "true"
+            cell.dataset.available === 'true'
               ? "available"
               : "unavailable"
           );
-        } else {
-          row.hidden = true;
         }
       }
     }
