@@ -59,7 +59,7 @@ export default class Carousel {
     const carousel = this._elem;
     const carouselArrowLeft = carousel.querySelector(".carousel__arrow_left");
     const carouselArrowRight = carousel.querySelector(".carousel__arrow_right");
-    const carouselPlusButton = carousel.querySelector(".carousel__button");
+    const carouselPlusButtons = carousel.querySelectorAll(".carousel__button");
 
     carouselArrowLeft.style.display = "none";
     carouselArrowLeft.style.userSelect = "none";
@@ -77,7 +77,9 @@ export default class Carousel {
       this._carouselArrowButtonVisibility
     );
 
-    carouselPlusButton.addEventListener("click", this._PlusButtonClickEvent);
+    for (let buttonElem of carouselPlusButtons) {
+      buttonElem.addEventListener("click", this._PlusButtonClickEvent);
+    }
   }
 
   _carouselScrolling(event) {
