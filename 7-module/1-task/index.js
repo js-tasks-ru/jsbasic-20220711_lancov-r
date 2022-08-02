@@ -1,7 +1,5 @@
 import createElement from "../../assets/lib/create-element.js";
 
-import createElement from "../../assets/lib/create-element.js";
-
 export default class RibbonMenu {
   constructor(categories) {
     this.categories = categories;
@@ -17,11 +15,11 @@ export default class RibbonMenu {
   }
 
   _initRibbonMenuMarkup() {
-    const ribbon__inner = document.createElement("div");
-    ribbon__inner.classList.add("ribbon__inner");
+    const ribbonInner = document.createElement("div");
+    ribbonInner.classList.add("ribbon__inner");
 
     this.categories.forEach((element, index) => {
-      ribbon__inner.insertAdjacentHTML(
+      ribbonInner.insertAdjacentHTML(
         "beforeend",
         `<a href="#" class="ribbon__item ${(index = 0
           ? "ribbon__item_active"
@@ -29,102 +27,94 @@ export default class RibbonMenu {
       );
     });
 
-    this._elem.append(RibbonMenu__inner);
+    this._elem.append(ribbonInner);
 
     this._elem.insertAdjacentHTML(
       "afterbegin",
-      `<button class="ribbon__arrow ribbon__arrow_left ribbon__arrow_visible">
+      `<button class="ribbon__arrow ribbon__arrow_left ">
         <img src="/assets/images/icons/angle-icon.svg" alt="icon">
       </button>`
     );
     this._elem.insertAdjacentHTML(
       "beforeend",
-      `<button class="ribbon__arrow ribbon__arrow_right">
+      `<button class="ribbon__arrow ribbon__arrow_right ribbon__arrow_visible">
       <img src="/assets/images/icons/angle-icon.svg" alt="icon">
       </button>
     </div>`
     );
-
-
   }
 
   _initRibbonMenuEvents() {
-    const RibbonMenu = this._elem;
-    const RibbonMenuArrowLeft = RibbonMenu.querySelector(
-      ".ribbon__arrow_left"
-    );
-    const RibbonMenuArrowRight = RibbonMenu.querySelector(
+    const ribbonInner = this._elem.querySelector(".ribbon__inner");
+    const ribbonMenuArrowLeft = this._elem.querySelector(".ribbon__arrow_left");
+    const ribbonMenuArrowRight = this._elem.querySelector(
       ".ribbon__arrow_right"
     );
-    const RibbonMenuItems = RibbonMenu.querySelectorAll(
-      ".ribbon__item"
-    );
 
-    RibbonMenuArrowLeft.style.display = "none";
-    RibbonMenuArrowLeft.style.userSelect = "none";
-    RibbonMenuArrowRight.style.userSelect = "none";
+    // ribbonMenuArrowLeft.style.display = "none";
+    // ribbonMenuArrowLeft.style.userSelect = "none";
+    // ribbonMenuArrowRight.style.userSelect = "none";
 
-    RibbonMenuArrowLeft.addEventListener("click", this._RibbonMenuScrolling);
-    RibbonMenuArrowLeft.addEventListener(
+    ribbonMenuArrowLeft.addEventListener("click", this._ribbonMenuScrolling);
+    ribbonMenuArrowLeft.addEventListener(
       "click",
-      this._RibbonMenuArrowButtonVisibility
+      this._ribbonMenuArrowButtonVisibility
     );
 
-    RibbonMenuArrowRight.addEventListener("click", this._RibbonMenuScrolling);
-    RibbonMenuArrowRight.addEventListener(
+    ribbonMenuArrowRight.addEventListener("click", this._ribbonMenuScrolling);
+    ribbonMenuArrowRight.addEventListener(
       "click",
-      this._RibbonMenuArrowButtonVisibility
+      this._ribbonMenuArrowButtonVisibility
     );
 
-    for (let buttonElem of RibbonMenuPlusButtons) {
-      buttonElem.addEventListener("click", this._PlusButtonClickEvent);
+    ribbonInner.addEventListener("click", this._ribbonInnerClickEvent);
+  }
+
+  _ribbonMenuScrolling(event) {
+    const ribbonMenu = event.currentTarget.closest(".ribbon");
+    const ribbonInner = ribbonMenu.querySelector(".ribbon__inner");
+
+    let scrollDirection = 0;
+    if (event.currentTarget.matches(".ribbon__arrow_left")) scrollDirection--;
+    if (event.currentTarget.matches(".ribbon__arrow_right")) scrollDirection++;
+
+    const scrollStep = 350 * scrollDirection;
+
+    ribbonInner.scrollBy(scrollStep, 0);
+  }
+
+  _ribbonMenuArrowButtonVisibility(event) {
+    function setButtonVisibilityClass(elem, visibilityState) {
+      if (!visibilityState) {
+        elem.classList.add("ribbon__arrow_visible");
+      } else {
+        elem.classList.remove("ribbon__arrow_visible");
+      }
     }
-  }
 
-  _RibbonMenuScrolling(event) {
-    const RibbonMenu = event.currentTarget.closest(".RibbonMenu");
-    let currentScrollState =
-      parseInt(RibbonMenu.dataset.currentScrollState, 10) || 0;
-
-    if (event.currentTarget.matches(".RibbonMenu__arrow_left"))
-      currentScrollState++;
-    if (event.currentTarget.matches(".RibbonMenu__arrow_right"))
-      currentScrollState--;
-
-    RibbonMenu.dataset.currentScrollState = currentScrollState;
-
-    const RibbonMenu__inner = RibbonMenu.querySelector(".RibbonMenu__inner");
-    RibbonMenu__inner.style.transform = `translateX(${
-      RibbonMenu__inner.clientWidth * currentScrollState
-    }px)`;
-  }
-
-  _RibbonMenuArrowButtonVisibility(event) {
-    const RibbonMenu = event.currentTarget.closest(".RibbonMenu");
-    const RibbonMenuArrowRight = RibbonMenu.querySelector(
-      ".RibbonMenu__arrow_right"
-    );
-    const RibbonMenuArrowLeft = RibbonMenu.querySelector(
-      ".RibbonMenu__arrow_left"
+    const ribbonMenu = event.currentTarget.closest(".ribbon");
+    const ribbonInner = ribbonMenu.querySelector(".ribbon__inner");
+    const ribbonMenuArrowLeft = ribbonMenu.querySelector(".ribbon__arrow_left");
+    const ribbonMenuArrowRight = ribbonMenu.querySelector(
+      ".ribbon__arrow_right"
     );
 
-    const currentScrollState = parseInt(
-      RibbonMenu.dataset.currentScrollState,
-      10
+    setButtonVisibilityClass(ribbonMenuArrowLeft, ribbonInner.scrollLeft === 0);
+    setButtonVisibilityClass(
+      ribbonMenuArrowRight,
+      ribbonInner.scrollWidth -
+        ribbonInner.scrollLeft -
+        ribbonInner.clientWidth ===
+        0
     );
-    const RibbonMenuChildrenElementsCount =
-      RibbonMenu.querySelector(".RibbonMenu__inner").childElementCount;
-
-    RibbonMenuArrowLeft.style.display = !currentScrollState ? "none" : "";
-    RibbonMenuArrowRight.style.display =
-      -currentScrollState === RibbonMenuChildrenElementsCount - 1 ? "none" : "";
   }
 
-  _PlusButtonClickEvent(event) {
+  _ribbonInnerClickEvent(event) {
     event.target.dispatchEvent(
-      new CustomEvent("ribbon-select", { // имя события должно быть именно 'ribbon-select'
+      new CustomEvent("ribbon-select", {
+        // имя события должно быть именно 'ribbon-select'
         detail: event.target.dataset.id, // уникальный идентификатора категории из её объекта
-        bubbles: true // это событие всплывает - это понадобится в дальнейшем
+        bubbles: true, // это событие всплывает - это понадобится в дальнейшем
       })
     );
   }
