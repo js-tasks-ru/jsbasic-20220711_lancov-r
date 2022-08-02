@@ -56,15 +56,11 @@ export default class RibbonMenu {
     // ribbonMenuArrowRight.style.userSelect = "none";
 
     ribbonMenuArrowLeft.addEventListener("click", this._ribbonMenuScrolling);
-    ribbonMenuArrowLeft.addEventListener(
-      "click",
-      this._ribbonMenuArrowButtonVisibility
-    );
-
     ribbonMenuArrowRight.addEventListener("click", this._ribbonMenuScrolling);
-    ribbonMenuArrowRight.addEventListener(
-      "click",
-      this._ribbonMenuArrowButtonVisibility
+
+    ribbonInner.addEventListener(
+      "scroll",
+      this._ribbonMenuArrowButtonVisibility.bind(this)
     );
 
     ribbonInner.addEventListener("click", this._ribbonInnerClickEvent);
@@ -85,10 +81,10 @@ export default class RibbonMenu {
 
   _ribbonMenuArrowButtonVisibility(event) {
     function setButtonVisibilityClass(elem, visibilityState) {
-      if (!visibilityState) {
-        elem.classList.add("ribbon__arrow_visible");
-      } else {
+      if ( visibilityState) {
         elem.classList.remove("ribbon__arrow_visible");
+      } else {
+        elem.classList.add("ribbon__arrow_visible");
       }
     }
 
@@ -104,12 +100,17 @@ export default class RibbonMenu {
       ribbonMenuArrowRight,
       ribbonInner.scrollWidth -
         ribbonInner.scrollLeft -
-        ribbonInner.clientWidth ===
-        0
-    );
+        ribbonInner.clientWidth < 1 );
   }
 
+ 
   _ribbonInnerClickEvent(event) {
+    event.preventDefault();
+
+    event.target.classList.add('ribbon__item_active')
+    if(this._prewSelectedElem !== undefined) this._prewSelectedElem.classList.remove('ribbon__item_active')
+    this._prewSelectedElem = event.target;
+   
     event.target.dispatchEvent(
       new CustomEvent("ribbon-select", {
         // имя события должно быть именно 'ribbon-select'
