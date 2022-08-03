@@ -36,6 +36,7 @@ export default class Modal {
     this.close = this.close.bind(this);
     this.escKeyDownEvent = this.escKeyDownEvent.bind(this);
   }
+
   setTitle(titleText) {
     this._modalTitle.innerHTML = titleText;
   }
