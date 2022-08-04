@@ -29,19 +29,20 @@ export default class StepSlider {
       this._sliderSteps.append(newSpan);
     }
 
-    this.elem.addEventListener("click", this._sliderClickEvent.bind(this));
+    this.elem.addEventListener("click", this.#_sliderClickEvent.bind(this));
+    //this.elem.addEventListener("pointerdown", this._mousePointerdown.bind(this))
     this.elem.ondragstart = () => false;
 
-    this._setStep(this.elem);
+    this.#_setStep(this.elem);
   }
 
-  _sliderClickEvent(event) {
+  #_sliderClickEvent(event) {
     const slider = event.currentTarget;
-    this._setNearestValue(slider, event.clientX);
-    this._setStep(slider);
+    this.#_setNearestValue(slider, event.clientX);
+    this.#_setStep(slider);
   }
 
-  _setNearestValue(slider, clientX) {
+  #_setNearestValue(slider, clientX) {
     const rect = slider.querySelector(".slider__steps").getBoundingClientRect();
     slider.dataset.value = Math.round(
       (clientX - (rect.left + window.pageXOffset)) /
@@ -49,7 +50,7 @@ export default class StepSlider {
     );
   }
 
-  _setStep(slider) {
+  #_setStep(slider) {
     slider.querySelector(".slider__value").innerHTML = slider.dataset.value;
 
     const stepsChildren = slider.querySelector(".slider__steps").children;
@@ -74,4 +75,49 @@ export default class StepSlider {
       slider.dataset.previousStep = slider.dataset.value;
     }
   }
+
+
+
+  #_mousePointerdown(event) {
+    thumb = this.elem.querySelector('slider__thumb');
+    let shiftX = event.clientX - thumb.getBoundingClientRect().left;
+    let shiftY = event.clientY - thumb.getBoundingClientRect().top;
+  
+    thumb.style.position = 'absolute';
+    thumb.style.zIndex = 1000;
+    document.body.append(thumb);
+  
+    moveAt(event.pageX, event.pageY);
+  
+    // переносит мяч на координаты (pageX, pageY),
+    // дополнительно учитывая изначальный сдвиг относительно указателя мыши
+    function moveAt(pageX, pageY) {
+      thumb.style.left = pageX - shiftX + 'px';
+      thumb.style.top = pageY - shiftY + 'px';
+    }
+  
+    function onPointermove(event) {
+      moveAt(event.pageX, event.pageY);
+    }
+  
+    // передвигаем мяч при событии mousemove
+    document.addEventListener('pointermove', onPointermove);
+  
+    // отпустить мяч, удалить ненужные обработчики
+    thumb.onmouseup = function() {
+      document.removeEventListener('pointermove', onPointermove);
+      thumb.onmouseup = null;
+    };
+  
+  };
+  
+
+// потенциальная цель переноса, над которой мы пролетаем прямо сейчас
+ currentDroppable = null;
+
 }
+
+
+
+
+
