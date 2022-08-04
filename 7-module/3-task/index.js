@@ -1,8 +1,11 @@
 export default class StepSlider {
   constructor({ steps, value = 0 }) {
-    this._steps = steps;
     this.elem = document.createElement("div");
     this.elem.className = "slider";
+    this.elem.dataset.steps = steps;
+    this.elem.dataset.value = Math.min(value, steps - 1);
+    this.elem.dataset.previousStep = value;
+
     this.elem.insertAdjacentHTML(
       "afterbegin",
       `
@@ -26,35 +29,48 @@ export default class StepSlider {
       this._sliderSteps.append(newSpan);
     }
 
-    this.elem.addEventListener("click", this._calculateNearestStep.bind(this));
+    this.elem.addEventListener("click", this._sliderClickEvent.bind(this));
+
+    this._setStep(this.elem);
   }
 
-  _calculateNearestStep(event) {
-    const rect = this.elem
-      .querySelector(".slider__steps")
-      .getBoundingClientRect();
-    const nearestStep = Math.round(
-      (event.clientX - (rect.left + window.pageXOffset)) /
-        (rect.width / (this._steps - 1))
-    );
+  _sliderClickEvent(event) {
+    const slider = event.currentTarget;
+    this._setNearestValue(slider, event.clientX);
+    this._setStep(slider);
+  }
 
-    this.elem.querySelector(".slider__value").innerHTML = nearestStep;
-    const stepsChildren = this.elem.querySelector(".slider__steps").children;
+  _setNearestValue(slider, clientX) {
+    const rect = slider.querySelector(".slider__steps").getBoundingClientRect();
+    slider.dataset.value = Math.round(
+      (clientX - (rect.left + window.pageXOffset)) /
+        (rect.width / (slider.dataset.steps - 1))
+    );
+  }
+
+  _setStep(slider) {
+    slider.querySelector(".slider__value").innerHTML = slider.dataset.value;
+
+    const stepsChildren = slider.querySelector(".slider__steps").children;
     for (let index = 0; index < stepsChildren.length; index++) {
       stepsChildren[index].className =
-        index === nearestStep ? "slider__step-active" : "";
+        index === slider.dataset.value ? "slider__step-active" : "";
     }
 
-    let leftPercents = (nearestStep / (this._steps - 1)) * 100;
-    this.elem.querySelector(".slider__thumb").style.left = `${leftPercents}%`;
-    this.elem.querySelector(
-      ".slider__progress"
-    ).style.width = `${leftPercents}%`;
+    let leftPercents =
+      (slider.dataset.value / (slider.dataset.steps - 1)) * 100;
+    slider.querySelector(".slider__thumb").style.left = `${leftPercents}%`;
+    slider.querySelector(".slider__progress").style.width = `${leftPercents}%`;
 
-    this.elem.dispatchEvent(new CustomEvent('slider-change', { // имя события должно быть именно 'slider-change'
-      detail: this.value, // значение 0, 1, 2, 3, 4
-      bubbles: true // событие всплывает - это понадобится в дальнейшем
-    }))
-
+    if (slider.dataset.previousStep !== slider.dataset.value) {
+      slider.dispatchEvent(
+        new CustomEvent("slider-change", {
+          // имя события должно быть именно 'slider-change'
+          detail: this.value, // значение 0, 1, 2, 3, 4
+          bubbles: true, // событие всплывает - это понадобится в дальнейшем
+        })
+      );
+      slider.dataset.previousStep = slider.dataset.value;
+    }
   }
 }
