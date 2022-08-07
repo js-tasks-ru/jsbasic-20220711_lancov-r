@@ -34,7 +34,7 @@ export default class Modal {
     this._modalClose = this._modal.querySelector(".modal__close");
 
     this.close = this.close.bind(this);
-    this.escKeyDownEvent = this.escKeyDownEvent.bind(this);
+    this._escKeyDownEvent = this._escKeyDownEvent.bind(this);
   }
 
   setTitle(titleText) {
@@ -52,16 +52,18 @@ export default class Modal {
     body.classList.add("is-modal-open");
 
     this._modalClose.addEventListener("click", this.close);
-    document.addEventListener("keydown", this.escKeyDownEvent);
+    document.addEventListener("keydown", this._escKeyDownEvent);
   }
 
   close() {
+    if(document.querySelector("body").classList.contains("is-modal-open")){
     document.querySelector("body").classList.remove("is-modal-open");
     document.querySelector(".modal").remove();
     this._modalClose.removeEventListener("click", this.close);
+    this._modalClose.removeEventListener("keydown", this._escKeyDownEvent);}
   }
 
-  escKeyDownEvent(event) {
+  _escKeyDownEvent(event) {
     if (event.code === "Escape") {
       this.close();
     }

@@ -22,11 +22,12 @@ export default class StepSlider {
     this.#sliderProgress = this.elem.querySelector(".slider__progress");
     this.#sliderSteps = this.elem.querySelector(".slider__steps");
 
-    this.#setStep(this.elem);
-
-    this.elem.ondragstart = () => false;
-    // this.elem.addEventListener("click", this.#onSliderClick);
+    this.#sliderThumb.ondragstart = () => false;
     this.elem.addEventListener("pointerdown", this.#mousePointerdown);
+    this.elem.addEventListener("click", this.#onSliderClick);
+
+    this.#setStep(this.elem);
+    this.#moveToValue();
   }
 
   #template() {
@@ -55,18 +56,56 @@ export default class StepSlider {
   }
 
   #onSliderClick = (event) => {
-    this.#setNearestValue(event.clientX);
+    this.#setNearestValue(event.pageX);
     this.#setStep();
+    this.#moveToValue();
+    this.#sliderChangeEvent();
   };
 
-  #setNearestValue(clientX) {
-    const rect = this.#sliderSteps.getBoundingClientRect();
-    this.#value = Math.round(
-      (clientX - (rect.left + window.pageXOffset)) /
-        (rect.width / (this.#steps - 1))
-    );
+  #mousePointerdown = (event) => {
+    const moveThumb = (pageX) => {
+      this.#sliderThumb.style.left = this.#calcThumbCoords(pageX).pc + "%";
+      this.#sliderProgress.style.width = this.#calcThumbCoords(pageX).pc + "%";
+
+    };
+
+    const onPointermove = (event) => {
+      moveThumb(event.pageX);
+      this.#setNearestValue(event.pageX);
+      this.#setStep();
+     };
+
+    this.elem.classList.add("slider_dragging");
+
+    document.addEventListener("pointermove", onPointermove);
+    document.onpointerup = () => {
+      document.removeEventListener("pointermove", onPointermove);
+      document.onpointerup = null;
+
+      this.#setStep();
+      this.#moveToValue();
+      this.#sliderChangeEvent();
+
+      this.elem.classList.remove("slider_dragging");
+    };
+  };
+
+  #moveToValue(){
+    const leftPercents = Math.round((this.#value / (this.#steps - 1)) * 100);
+    this.#sliderProgress.style.width = `${leftPercents}%`;
+    this.#sliderThumb.style.left = `${leftPercents}%`;
   }
 
+  #calcThumbCoords(pageX) {
+    const rect = this.#sliderSteps.getBoundingClientRect();
+    let thumbXCoord = pageX - (rect.left + window.pageXOffset);
+    thumbXCoord = Math.max(thumbXCoord, 0);
+    thumbXCoord = Math.min(thumbXCoord, rect.width);
+
+    return { px: thumbXCoord, pc: (thumbXCoord / rect.width) * 100 };
+    
+  }
+  
   #setStep() {
     this.#sliderValue.innerHTML = this.#value;
 
@@ -76,14 +115,19 @@ export default class StepSlider {
         index === this.#value ? "slider__step-active" : "";
     }
 
-    let leftPercents = (this.#value / (this.#steps - 1)) * 100;
-    this.#sliderThumb.style.left = `${leftPercents}%`;
-    this.#sliderProgress.style.width = `${leftPercents}%`;
+  }
 
+  #setNearestValue = (pageX) => {
+    this.#value = Math.round(
+      this.#calcThumbCoords(pageX).px /
+        (this.#sliderSteps.getBoundingClientRect().width / (this.#steps - 1))
+    );
+  };
+
+  #sliderChangeEvent(){
     if (this.#previousValue !== this.#value) {
       this.elem.dispatchEvent(
         new CustomEvent("slider-change", {
-          // имя события должно быть именно 'slider-change'
           detail: this.#value, // значение 0, 1, 2, 3, 4
           bubbles: true, // событие всплывает - это понадобится в дальнейшем
         })
@@ -92,30 +136,4 @@ export default class StepSlider {
     }
   }
 
-  #mousePointerdown = (event) => {
-    const moveAt = (pageX) => {
-      this.#sliderThumb.style.left = pageX - shiftX + "px";
-      // console.log(`pageX: ${pageX}; shiftX ${shiftX}`);
-    };
-
-    const onPointermove = (event) => {
-      moveAt(event.pageX);
-    };
-
-    let shiftX = event.clientX - this.#sliderThumb.getBoundingClientRect().left;
-    console.log(this.#sliderThumb.getBoundingClientRect());
-    this.#sliderThumb.style.position = "absolute";
-    this.#sliderThumb.style.zIndex = 1000;
-
-    //moveAt(event.pageX);
-
-    document.addEventListener("pointermove", onPointermove);
-
-    this.#sliderThumb.onmouseup = function () {
-      document.removeEventListener("pointermove", onPointermove);
-      this.#sliderThumb.onmouseup = null;
-    };
-  };
-
-  currentDroppable = null;
 }
