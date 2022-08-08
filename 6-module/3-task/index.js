@@ -3,10 +3,8 @@ import createElement from "../../assets/lib/create-element.js";
 export default class Carousel {
   constructor(slides) {
     this.slides = slides;
-    this._elem = document.createElement("div");
-    this._elem.classList.add("carousel");
 
-    this._initCarouselMarkup();
+    this._elem = createElement(this._template());
     this._initCarouselEvents();
   }
 
@@ -14,45 +12,40 @@ export default class Carousel {
     return this._elem;
   }
 
-  _initCarouselMarkup() {
-    const carousel__inner = document.createElement("div");
-    carousel__inner.classList.add("carousel__inner");
-
-    this.slides.forEach((element) => {
-      carousel__inner.insertAdjacentHTML(
-        "beforeend",
-        `
-        <div class="carousel__slide" data-id=${element.id}>
-          <img src="/assets/images/carousel/${
-            element.image
-          }" class="carousel__img" alt="slide">
-          <div class="carousel__caption">
-            <span class="carousel__price">€${parseInt(element.price).toFixed(
-              2
-            )}</span>
-            <div class="carousel__title">${element.name}</div>
-            <button type="button" class="carousel__button">
-              <img src="/assets/images/icons/plus-icon.svg" alt="icon">
-            </button>
-          </div>
-        </div>
-        `
-      );
-    });
-
-    this._elem.insertAdjacentHTML(
-      "beforeend",
-      `
-      <!--Кнопки переключения-->
-      <div class="carousel__arrow carousel__arrow_right">
-        <img src="/assets/images/icons/angle-icon.svg" alt="icon">
+  _template() {
+    return `
+    <div class="carousel">
+    <!--Кнопки переключения-->
+    <div class="carousel__arrow carousel__arrow_right">
+      <img src="/assets/images/icons/angle-icon.svg" alt="icon">
+    </div>
+    <div class="carousel__arrow carousel__arrow_left">
+      <img src="/assets/images/icons/angle-left-icon.svg" alt="icon">
+    </div>
+    <div class="carousel__inner">
+    ${this.slides
+      .map(
+        (element) => `
+    <div class="carousel__slide" data-id=${element.id}>
+      <img src="/assets/images/carousel/${
+        element.image
+      }" class="carousel__img" alt="slide">
+      <div class="carousel__caption">
+        <span class="carousel__price">€${parseInt(element.price).toFixed(
+          2
+        )}</span>
+        <div class="carousel__title">${element.name}</div>
+        <button type="button" class="carousel__button">
+          <img src="/assets/images/icons/plus-icon.svg" alt="icon">
+        </button>
       </div>
-      <div class="carousel__arrow carousel__arrow_left">
-        <img src="/assets/images/icons/angle-left-icon.svg" alt="icon">
-      </div> `
-    );
-
-    this._elem.append(carousel__inner);
+    </div>
+    `
+      )
+      .join("")}
+    </div>
+  </div>
+    `;
   }
 
   _initCarouselEvents() {
