@@ -10,7 +10,7 @@ export default class ProductGrid {
 
   #filters = {};
 
-  set filters(val) {
+  #setFilters(val) {
     for (const key in val) this.#filters[key] = val[key];
   }
 
@@ -22,11 +22,14 @@ export default class ProductGrid {
   // productGrid.updateFilter({ category: '' });
 
   #render() {
+    console.clear();
+    console.log(this.#filters)
+
     this.elem = createElement(`
     <div class="products-grid">
       <div class="products-grid__inner">
         ${this.products
-          .map(this.#eligibledProduct, productObj)
+          .map(this.#eligibledProduct)
           .reduce(
             (renderedCards, card) =>
               (renderedCards += card === null ? "" : card.outerHTML),
@@ -37,11 +40,11 @@ export default class ProductGrid {
     `);
   }
 
-  #eligibledProduct(productObj) {
+  #eligibledProduct = (productObj) => {
     const filters = this.#filters;
 
     if (filters.noNuts && "nuts" in productObj) return null;
-    if (filters.vegeterianOnly && !"vegeterian" in productObj) return null;
+    if (filters.vegeterianOnly && !("vegeterian" in productObj)) return null;
     if (
       "maxSpiciness" in filters &&
       filters.maxSpiciness < productObj.spiciness
@@ -53,12 +56,12 @@ export default class ProductGrid {
       filters.category !== productObj.category
     )
       return null;
-
+      console.log(1);
     return new ProductCard(productObj).elem;
   }
 
   updateFilter(filterObject) {
-    this.#filters = filterObject;
+    this.#setFilters(filterObject);
     this.#render();
   }
 }
