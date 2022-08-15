@@ -16,7 +16,7 @@ export default class Cart {
       this.cartItems.push(cartItem);
     }
 
-    onProductUpdate(cartItem);
+    this.onProductUpdate(cartItem);
   }
 
   updateProductCount(productId, amount) {
@@ -24,26 +24,26 @@ export default class Cart {
     if (!cartItem) return;
     cartItem.count += amount;
     if (cartItem.count <= 0)
-      cartItems = cartItems.filter((val) => {
+      this.cartItems = this.cartItems.filter((val) => {
         val?.id === productId;
       });
 
-    onProductUpdate(cartItem);
+    this.onProductUpdate(cartItem);
   }
 
   isEmpty() {
-    return !cartItems.length;
+    return !this.cartItems.length;
   }
 
   getTotalCount() {
-    return cartItems.reduce((sum, val) => {
-      sum += val.count;
+    return this.cartItems.reduce((sum, val) => {
+      val.count;
     }, 0);
   }
 
   getTotalPrice() {
-    return cartItems.reduce((sum, val) => {
-      sum += val.count * product.price;
+    return this.cartItems.reduce((sum, val) => {
+      val.count * val.product.price;
     }, 0);
   }
 
@@ -55,15 +55,15 @@ export default class Cart {
 
   #checkProduct(product) {
     return (
-      Boolean(product) && typeof product === "object" && "id",
+      !Boolean(product) ? false : (typeof product === "object" && "id",
       "image",
       "name",
       "price",
-      "category" in product
+      "category" in product)
     );
   }
 
   #getProductByID(id) {
-    return cartItems.find((val) => val?.product?.id === id);
+    return this.cartItems.find((val) => val?.product?.id === id);
   }
 }
