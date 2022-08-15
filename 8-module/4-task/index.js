@@ -1,7 +1,7 @@
-import createElement from '../../assets/lib/create-element.js';
-import escapeHtml from '../../assets/lib/escape-html.js';
+import createElement from "../../assets/lib/create-element.js";
+import escapeHtml from "../../assets/lib/escape-html.js";
 
-import Modal from '../../7-module/2-task/index.js';
+import Modal from "../../7-module/2-task/index.js";
 
 export default class Cart {
   cartItems = []; // [product: {...}, count: N]
@@ -13,30 +13,64 @@ export default class Cart {
   }
 
   addProduct(product) {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    if (!this.#checkProduct(product)) return;
+
+    let cartItem = this.#getProductByID(product?.id);
+    if (cartItem) {
+      cartItem.count++;
+    } else {
+      let cartItem = { product, count: 1 };
+      this.cartItems.push(cartItem);
+    }
+
+    onProductUpdate(cartItem);
   }
 
   updateProductCount(productId, amount) {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    const cartItem = this.#getProductByID(productId);
+    if (!cartItem) return;
+    cartItem.count += amount;
+    if (cartItem.count <= 0)
+      cartItems = cartItems.filter((val) => {
+        val?.id === productId;
+      });
+
+    onProductUpdate(cartItem);
   }
 
   isEmpty() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return !cartItems.length;
   }
 
   getTotalCount() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return cartItems.reduce((sum, val) => {
+      sum += val.count;
+    }, 0);
   }
 
   getTotalPrice() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return cartItems.reduce((sum, val) => {
+      sum += val.count * product.price;
+    }, 0);
+  }
+
+  #checkProduct(product) {
+    return (
+      Boolean(product) && typeof product === "object" && "id",
+      "image",
+      "name",
+      "price",
+      "category" in product
+    );
+  }
+
+  #getProductByID(id) {
+    return cartItems.find((val) => val?.product?.id === id);
   }
 
   renderProduct(product, count) {
     return createElement(`
-    <div class="cart-product" data-product-id="${
-      product.id
-    }">
+    <div class="cart-product" data-product-id="${product.id}">
       <div class="cart-product__img">
         <img src="/assets/images/products/${product.image}" alt="product">
       </div>
@@ -95,10 +129,9 @@ export default class Cart {
 
   onSubmit(event) {
     // ...ваш код
-  };
+  }
 
   addEventListeners() {
     this.cartIcon.elem.onclick = () => this.renderModal();
   }
 }
-
