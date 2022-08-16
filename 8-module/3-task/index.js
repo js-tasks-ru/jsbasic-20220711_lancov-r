@@ -36,15 +36,14 @@ export default class Cart {
   }
 
   getTotalCount() {
-    return this.cartItems.reduce((sum, val) => {
-      val.count;
-    }, 0);
+    return this.cartItems.reduce((sum, val) => val.count, 0);
   }
 
   getTotalPrice() {
-    return this.cartItems.reduce((sum, val) => {
-      val.count * val.product.price;
-    }, 0);
+    return this.cartItems.reduce(
+      (sum, val) => val.count * val.product.price,
+      0
+    );
   }
 
   onProductUpdate(cartItem) {
@@ -54,13 +53,13 @@ export default class Cart {
   }
 
   #checkProduct(product) {
-    return (
-      !Boolean(product) ? false : (typeof product === "object" && "id",
-      "image",
-      "name",
-      "price",
-      "category" in product)
-    );
+    return !Boolean(product)
+      ? false
+      : (typeof product === "object" && "id",
+        "image",
+        "name",
+        "price",
+        "category" in product);
   }
 
   #getProductByID(id) {

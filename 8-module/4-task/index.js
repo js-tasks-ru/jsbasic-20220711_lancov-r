@@ -23,7 +23,7 @@ export default class Cart {
       this.cartItems.push(cartItem);
     }
 
-    onProductUpdate(cartItem);
+    this.onProductUpdate(cartItem);
   }
 
   updateProductCount(productId, amount) {
@@ -31,41 +31,40 @@ export default class Cart {
     if (!cartItem) return;
     cartItem.count += amount;
     if (cartItem.count <= 0)
-      cartItems = cartItems.filter((val) => {
+      this.cartItems = this.cartItems.filter((val) => {
         val?.id === productId;
       });
 
-    onProductUpdate(cartItem);
+    this.onProductUpdate(cartItem);
   }
 
   isEmpty() {
-    return !cartItems.length;
+    return !this.cartItems.length;
   }
 
   getTotalCount() {
-    return cartItems.reduce((sum, val) => {
-      sum += val.count;
-    }, 0);
+    return this.cartItems.reduce((sum, val) => sum + val.count, 0);
   }
 
   getTotalPrice() {
-    return cartItems.reduce((sum, val) => {
-      sum += val.count * product.price;
-    }, 0);
-  }
-
-  #checkProduct(product) {
-    return (
-      Boolean(product) && typeof product === "object" && "id",
-      "image",
-      "name",
-      "price",
-      "category" in product
+    return this.cartItems.reduce(
+      (sum, val) => sum + val.count * val.product.price,
+      0
     );
   }
 
+  #checkProduct(product) {
+    return !Boolean(product)
+      ? false
+      : (typeof product === "object" && "id",
+        "image",
+        "name",
+        "price",
+        "category" in product);
+  }
+
   #getProductByID(id) {
-    return cartItems.find((val) => val?.product?.id === id);
+    return this.cartItems.find((val) => val?.product?.id === id);
   }
 
   renderProduct(product, count) {
@@ -118,7 +117,28 @@ export default class Cart {
   }
 
   renderModal() {
-    // ...ваш код
+    const modalButtonEvent = (event) => {
+      this.updateProductCount(
+        event.currentTarget.closest(".cart-product").dataset.productId,
+        event.currentTarget.matches(".cart-counter__button_plus") ? 1 : -1
+      );
+    };
+
+    let modal = new Modal();
+    modal.setTitle("Your order");
+    const cartWrapper = document.createElement("div");
+    modal.setBody(cartWrapper);
+    this.cartItems.forEach((element) => {
+      cartWrapper.append(this.renderProduct(element.product, element.count));
+    });
+    cartWrapper.append(this.renderOrderForm());
+
+    cartWrapper.querySelector(".cart-counter__button_plus").onclick =
+      modalButtonEvent;
+    cartWrapper.querySelector(".cart-counter__button_minus").onclick =
+      modalButtonEvent;
+
+    modal.open();
   }
 
   onProductUpdate(cartItem) {
