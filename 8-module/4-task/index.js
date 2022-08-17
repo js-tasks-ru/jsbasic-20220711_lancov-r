@@ -1,6 +1,7 @@
 import createElement from "../../assets/lib/create-element.js";
 import escapeHtml from "../../assets/lib/escape-html.js";
 
+
 import Modal from "../../7-module/2-task/index.js";
 
 export default class Cart {
@@ -88,13 +89,12 @@ export default class Cart {
   }
 
   #checkProduct(product) {
-    return !Boolean(product)
-      ? false
-      : (typeof product === "object" && "id",
-        "image",
-        "name",
-        "price",
-        "category" in product);
+    return Object.prototype.toString.apply(product) === '[object Object]' 
+    && "id" in product 
+    && "image" in product
+    && "name" in product
+    && "price" in product
+    && "category" in product 
   }
 
   #getProductByID(id) {
@@ -166,33 +166,49 @@ export default class Cart {
     this.#modalCartWrapper.append(this.renderOrderForm());
 
     this.#modalCartWrapper.onclick = (event) => {
-      const plusButtonPushed = event.target.closest(
-        ".cart-counter__button_plus"
-      );
-      const minusButtonPushed = event.target.closest(
-        ".cart-counter__button_minus"
-      );
+      event.target.closest(".cart-counter__button_plus") &&
+        this.updateProductCount(event.target.closest(".cart-product").dataset.productId,  1 );
 
-      const currentCartProduct =
-        event.target.closest(".cart-product").dataset.productId;
-
-      if (plusButtonPushed) this.updateProductCount(currentCartProduct, 1);
-      if (minusButtonPushed) this.updateProductCount(currentCartProduct, -1);
+      event.target.closest(".cart-counter__button_minus") &&
+        this.updateProductCount(event.target.closest(".cart-product").dataset.productId, -1 );
     };
 
+    this.#modalCartWrapper.querySelector("form").onsubmit = this.onSubmit;
     this.#modal.open();
   }
 
-  onSubmit(event) {
+  onSubmit = (event) => {
     event.preventDefault();
-  }
+
+    this.#modalCartWrapper
+      .querySelector("[type=submit]")
+      .classList.add("is-loading");
+
+    fetch("https://httpbin.org/post", {
+      method: "POST",
+      body: new FormData(this.#modalCartWrapper.querySelector(".cart-form")),
+    }).then((response) => {
+      if (response.ok) {
+        this.#modal.setTitle('Success!');
+        this.cartItems = [];  
+        this.#modalCartWrapper.onclick = "";
+        this.#modal.setBody(createElement(`
+        <div class="modal__body-inner">
+          <p>
+            Order successful! Your order is being cooked :) <br>
+            We’ll notify you about delivery time shortly.<br>
+            <img src="/assets/images/delivery.gif">
+          </p>
+        </div>
+        `))
+      }
+    });
+
+  };
 
   addEventListeners() {
     this.cartIcon.elem.onclick = () => this.renderModal();
-    let response = await fetch('https://httpbin.org/post', {
-      method: 'POST',
-      body: new FormData(this.#modalCartWrapper.querySelector('.cart-form'))
-    });
-
   }
 }
+
+ 

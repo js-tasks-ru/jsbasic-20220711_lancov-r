@@ -12,7 +12,7 @@ export default class Cart {
     if (cartItem) {
       cartItem.count++;
     } else {
-      let cartItem = { product, count: 1 };
+      cartItem = { product, count: 1 };
       this.cartItems.push(cartItem);
     }
 
@@ -24,9 +24,9 @@ export default class Cart {
     if (!cartItem) return;
     cartItem.count += amount;
     if (cartItem.count <= 0)
-      this.cartItems = this.cartItems.filter((val) => {
-        val?.id === productId;
-      });
+      this.cartItems = this.cartItems.filter(
+        (val) => val?.product?.id !== productId
+      );
 
     this.onProductUpdate(cartItem);
   }
@@ -36,12 +36,12 @@ export default class Cart {
   }
 
   getTotalCount() {
-    return this.cartItems.reduce((sum, val) => val.count, 0);
+    return this.cartItems.reduce((sum, val) => sum + val.count, 0);
   }
 
   getTotalPrice() {
     return this.cartItems.reduce(
-      (sum, val) => val.count * val.product.price,
+      (sum, val) => sum + val.count * val.product.price,
       0
     );
   }
@@ -53,13 +53,12 @@ export default class Cart {
   }
 
   #checkProduct(product) {
-    return !Boolean(product)
-      ? false
-      : (typeof product === "object" && "id",
-        "image",
-        "name",
-        "price",
-        "category" in product);
+    return Object.prototype.toString.apply(product) === '[object Object]' 
+    && "id" in product 
+    && "image" in product
+    && "name" in product
+    && "price" in product
+    && "category" in product 
   }
 
   #getProductByID(id) {
