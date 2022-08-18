@@ -46,11 +46,11 @@ export default class CartIcon {
   updatePosition() {
     if (window.pageYOffset) {
       const cart = document.querySelector(".cart-icon");
-      const containerRect = document
-        .querySelector(".container")
-        .getBoundingClientRect();
+      const containerRect = Math.round(
+        document.querySelector(".container").getBoundingClientRect()
+      );
 
-        const cartLeftShift = 
+      const cartLeftShift =
         containerRect.width + cart.clientWidth + 20 < containerRect.right
           ? containerRect.right + 20
           : document.documentElement.clientWidth - cart.offsetWidth - 10;
