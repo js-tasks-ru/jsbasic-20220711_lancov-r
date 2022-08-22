@@ -32,7 +32,7 @@ export default class Modal {
     this._modalTitle = this._modal.querySelector(".modal__title");
     this._modalBody = this._modal.querySelector(".modal__body");
     this._modalClose = this._modal.querySelector(".modal__close");
-
+    this.modalCloseListeners = [];
     this.close = this.close.bind(this);
     this._escKeyDownEvent = this._escKeyDownEvent.bind(this);
   }
@@ -51,8 +51,15 @@ export default class Modal {
     body.append(this._modal);
     body.classList.add("is-modal-open");
 
+    // must stay first in event list!!
+    this.modalCloseListeners.forEach(element => {
+      this._modalClose.addEventListener(element.eventName, element.callBackFunc);    
+    });
+    
     this._modalClose.addEventListener("click", this.close);
     document.addEventListener("keydown", this._escKeyDownEvent);
+
+
   }
 
   close() {
@@ -61,6 +68,10 @@ export default class Modal {
     document.querySelector(".modal").remove();
     this._modalClose.removeEventListener("click", this.close);
     this._modalClose.removeEventListener("keydown", this._escKeyDownEvent);}
+    this.modalCloseListeners.forEach(element => {
+      this._modalClose.removeEventListener(element.eventName, element.callBackFunc);    
+    });
+
   }
 
   _escKeyDownEvent(event) {

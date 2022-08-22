@@ -54,7 +54,7 @@ export default class CartIcon {
         containerRect.width + cart.clientWidth + 20 < containerRect.right
           ? containerRect.right + 20
           : document.documentElement.clientWidth - cart.offsetWidth - 10;
-      cart.style = `position: fixed; top: 50px; z-index: 1000; left: ${cartLeftShift}px;`;
+      cart.style = `position: fixed; top: 50px; z-index: 900; left: ${cartLeftShift}px;`;
     }
   }
 }

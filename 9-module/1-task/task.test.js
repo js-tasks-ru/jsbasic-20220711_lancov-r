@@ -7,7 +7,6 @@ describe('9-module-1-task', () => {
 
     promiseClick(button).then((event) => {
       expect(event).toBe(clickEvent);
-
       done();
     });
 

@@ -173,6 +173,15 @@ export default class Cart {
         this.updateProductCount(event.target.closest(".cart-product").dataset.productId, -1 );
     };
 
+    this.#modal.modalCloseListeners.push({
+      eventName: 'click',
+      callBackFunc: ()=>{
+         this.cartIcon.update(this);
+      }  
+    })
+ 
+
+
     this.#modalCartWrapper.querySelector("form").onsubmit = this.onSubmit;
     this.#modal.open();
   }
